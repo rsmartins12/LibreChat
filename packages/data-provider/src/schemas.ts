@@ -796,6 +796,7 @@ export const tPresetSchema = tConversationSchema
       defaultPreset: z.boolean().optional(),
       order: z.number().optional(),
       endpoint: extendedModelEndpointSchema.nullable(),
+      mcp: z.string().optional(),
     }),
   );
 

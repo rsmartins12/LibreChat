@@ -94,8 +94,19 @@ jest.mock('librechat-data-provider', () => ({
   },
   isAgentsEndpoint: jest.fn(() => false),
   isAssistantsEndpoint: jest.fn(() => false),
-  QueryKeys: { startupConfig: 'startupConfig', endpoints: 'endpoints' },
+  QueryKeys: { startupConfig: 'startupConfig', endpoints: 'endpoints', agents: 'agents' },
   EModelEndpoint: { custom: 'custom', assistants: 'assistants', agents: 'agents' },
+  PermissionBits: { EDIT: 'edit' },
+}));
+
+// Mock useMCPSelect hook
+jest.mock('~/hooks/MCP/useMCPSelect', () => ({
+  useMCPSelect: jest.fn(() => ({
+    setMCPValues: jest.fn(),
+    mcpValues: [],
+    isPinned: true,
+    setIsPinned: jest.fn(),
+  })),
 }));
 
 // Mock data-provider hooks

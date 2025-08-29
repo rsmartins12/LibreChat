@@ -18,7 +18,7 @@ import type {
 } from 'librechat-data-provider';
 import type { ZodAny } from 'zod';
 import { getConvoSwitchLogic, getModelSpecIconURL, removeUnavailableTools, logger } from '~/utils';
-import { useAuthContext, useAgentsMap, useDefaultConvo, useSubmitMessage } from '~/hooks';
+import {useAuthContext, useAgentsMap, useDefaultConvo, useSubmitMessage, useMCPSelect } from '~/hooks';
 import { useChatContext, useChatFormContext } from '~/Providers';
 import { useGetAgentByIdQuery } from '~/data-provider';
 import store from '~/store';
@@ -124,6 +124,7 @@ export default function useQueryParams({
 
   const queryClient = useQueryClient();
   const { conversation, newConversation } = useChatContext();
+  const { setMCPValues } = useMCPSelect({ conversationId: conversation?.conversationId });
 
   const urlAgentId = searchParams.get('agent_id') || '';
   const { data: urlAgent } = useGetAgentByIdQuery(urlAgentId);
@@ -289,6 +290,18 @@ export default function useQueryParams({
         queryParams[key] = value;
       });
 
+      const mcpServers = queryParams.mcp;
+      if (mcpServers) {
+        const servers = mcpServers
+          .split(',')
+          .map((s) => s.trim())
+          .filter((s) => s);
+        if (servers.length) {
+          setMCPValues(servers);
+        }
+        delete queryParams.mcp;
+      }
+
       // Support both 'prompt' and 'q' as query parameters, with 'prompt' taking precedence
       const decodedPrompt = queryParams.prompt || queryParams.q || '';
       const shouldAutoSubmit = queryParams.submit?.toLowerCase() === 'true';
@@ -332,6 +345,7 @@ export default function useQueryParams({
         currentParams.delete('prompt');
         currentParams.delete('q');
         currentParams.delete('submit');
+        currentParams.delete('mcp');
 
         setSearchParams(currentParams, { replace: true });
         processedRef.current = true;
@@ -412,6 +426,7 @@ export default function useQueryParams({
     setSearchParams,
     queryClient,
     processSubmission,
+    setMCPValues,
   ]);
 
   useEffect(() => {
